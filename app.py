@@ -1,12 +1,22 @@
 from flask import Flask, request, render_template, jsonify
 import requests
+from models import db, Contact
 
 app = Flask(__name__)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 
 @app.route("/")
 def homepage():
-    return "Welcome to Homepage using Flask!"
+    contacts = Contact.query.all()
+    return render_template("home.html", contacts=contacts)
 
 
 @app.route("/hi")
@@ -71,6 +81,18 @@ def api_post(post_id):
     response = requests.get(f"https://jsonplaceholder.typicode.com/posts/{post_id}")
     # return jsonify(response.json()["title"])
     return jsonify(response.json())
+
+
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        message = request.form.get("message")
+        new_contact = Contact(name=name, email=email, message=message)
+        db.session.add(new_contact)
+        db.session.commit()
+    return render_template("contact.html")
 
 
 if __name__ == "__main__":

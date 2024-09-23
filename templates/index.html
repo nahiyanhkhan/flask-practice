@@ -10,6 +10,7 @@
 </head>
 
 <body>
+    {% block content %}
     <h1>Welcome to Flask</h1>
     <p>{{ data1.name }} | {{ data1.age }}</p>
     <p>{{ data2.name }} | {{ data2.age }}</p>
@@ -19,8 +20,8 @@
         {% for lang in languages %}
         <li> {{ lang }} </li>
         {% endfor %}
-
     </ul>
+    {% endblock %}
 </body>
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
